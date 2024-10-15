@@ -14,7 +14,10 @@ interface CurrencyItemProps {
 
 const CurrencyItem: React.FC<CurrencyItemProps> = ({ item, isHighlight }) => {
   return (
-    <View style={[styles.container, isHighlight && styles.highlightContainer]}>
+    <View
+      style={[styles.container, isHighlight && styles.highlightContainer]}
+      testID="currency-item-container"
+    >
       <View style={styles.codeContainer}>
         <Text style={styles.code}>{item.code}</Text>
       </View>
@@ -25,7 +28,7 @@ const CurrencyItem: React.FC<CurrencyItemProps> = ({ item, isHighlight }) => {
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
