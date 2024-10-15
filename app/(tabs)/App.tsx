@@ -1,19 +1,23 @@
 import CurrencyList from '@/src/components/CurrencyList';
+import { Colors } from '@/src/styles/colors';
 import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView, StyleSheet, StatusBar } from 'react-native';
 
 const App: React.FC = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <CurrencyList />
-    </SafeAreaView>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
+      <SafeAreaView style={styles.container}>
+        <CurrencyList />
+      </SafeAreaView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
   },
 });
 
