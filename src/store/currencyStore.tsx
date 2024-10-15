@@ -10,6 +10,7 @@ interface CurrencyState {
   error: string | null;
   fetchRates: () => Promise<void>;
   getHighestAndLowestRates: () => { highest: CurrencyInfo | null; lowest: CurrencyInfo | null };
+  getSortedRates: () => CurrencyInfo[];
 }
 
 const useCurrencyStore = create<CurrencyState>()(
@@ -45,6 +46,10 @@ const useCurrencyStore = create<CurrencyState>()(
           highest: sorted[0],
           lowest: sorted[sorted.length - 1]
         };
+      },
+      getSortedRates: () => {
+        const { rates } = get();
+        return [...rates].sort((a, b) => b.rate - a.rate);
       }
     }),
     {

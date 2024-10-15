@@ -1,11 +1,10 @@
-import React, { useEffect } from "react";
-import { FlatList, StyleSheet, View, Text } from "react-native";
-import CurrencyItem from "./CurrencyItem";
-import useCurrencyStore from "../store/currencyStore";
+import React, { useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import useCurrencyStore from '../store/currencyStore';
+import CurrencyItem from './CurrencyItem';
 
-const CurrencyList = () => {
-  const { rates, fetchRates, isLoading, error, getHighestAndLowestRates } =
-    useCurrencyStore();
+const CurrencyList: React.FC = () => {
+  const { rates, fetchRates, isLoading, error, getHighestAndLowestRates, getSortedRates } = useCurrencyStore();
 
   useEffect(() => {
     fetchRates();
@@ -14,8 +13,7 @@ const CurrencyList = () => {
   }, [fetchRates]);
 
   const { highest, lowest } = getHighestAndLowestRates();
-
-  const renderItem = ({ item }) => <CurrencyItem item={item} />;
+  const sortedRates = getSortedRates();
 
   if (isLoading && rates.length === 0) {
     return <Text style={styles.message}>Loading...</Text>;
@@ -35,8 +33,8 @@ const CurrencyList = () => {
         </View>
       )}
       <FlatList
-        data={rates}
-        renderItem={renderItem}
+        data={sortedRates}
+        renderItem={({ item }) => <CurrencyItem item={item} />}
         keyExtractor={(item) => item.code}
       />
     </View>
@@ -49,17 +47,17 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 18,
-    textAlign: "center",
+    textAlign: 'center',
     margin: 20,
   },
   highlightContainer: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: '#f0f0f0',
     padding: 10,
     marginBottom: 10,
   },
   highlightTitle: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 5,
   },
 });
