@@ -1,11 +1,15 @@
-import React, { useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useEffect, useCallback } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import useCurrencyStore from '../store/currencyStore';
 import CurrencyItem from './CurrencyItem';
 import { Colors } from '../styles/colors';
 
 const CurrencyList: React.FC = () => {
   const { rates, fetchRates, isLoading, error, getHighestAndLowestRates, getSortedRates } = useCurrencyStore();
+
+  const onRefresh = useCallback(() => {
+    fetchRates();
+  }, [fetchRates]);
 
   useEffect(() => {
     fetchRates();
@@ -47,6 +51,9 @@ const CurrencyList: React.FC = () => {
         renderItem={({ item }) => <CurrencyItem item={item} />}
         keyExtractor={(item) => item.code}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={onRefresh} colors={[Colors.primary]} />
+        }
       />
     </View>
   );
