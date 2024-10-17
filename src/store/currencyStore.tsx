@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchCurrencyRates, CurrencyInfo } from '../api/currencyApi';
 
@@ -25,7 +25,8 @@ const useCurrencyStore = create<CurrencyState>()(
           const data = await fetchCurrencyRates();
           const ratesArray = Object.entries(data).map(([code, info]) => ({
             ...info,
-            code
+            code,
+            rate: parseFloat(info.rate.toFixed(4)) // Ensure rate is a number and rounded to 4 decimal places
           }));
           set({
             rates: ratesArray,
@@ -49,18 +50,7 @@ const useCurrencyStore = create<CurrencyState>()(
     }),
     {
       name: 'currency-store',
-      storage: {
-        getItem: async (name) => {
-          const value = await AsyncStorage.getItem(name);
-          return value ? JSON.parse(value) : null;
-        },
-        setItem: async (name, value) => {
-          await AsyncStorage.setItem(name, JSON.stringify(value));
-        },
-        removeItem: async (name) => {
-          await AsyncStorage.removeItem(name);
-        }
-      }
+      storage: createJSONStorage(() => AsyncStorage),
     }
   )
 );
