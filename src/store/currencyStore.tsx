@@ -1,6 +1,6 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createJSONStorage, persist } from 'zustand/middleware';
 import { fetchCurrencyRates, CurrencyInfo } from '../api/currencyApi';
 
 interface CurrencyState {
@@ -10,7 +10,6 @@ interface CurrencyState {
   error: string | null;
   fetchRates: () => Promise<void>;
   getHighestAndLowestRates: () => { highest: CurrencyInfo | null; lowest: CurrencyInfo | null };
-  getSortedRates: () => CurrencyInfo[];
 }
 
 const useCurrencyStore = create<CurrencyState>()(
@@ -34,7 +33,7 @@ const useCurrencyStore = create<CurrencyState>()(
             isLoading: false
           });
         } catch (error) {
-          set({ error: (error instanceof Error) ? error.message : 'An unknown error occurred', isLoading: false });
+          set({ error: (error as Error).message, isLoading: false });
         }
       },
       getHighestAndLowestRates: () => {
@@ -46,15 +45,22 @@ const useCurrencyStore = create<CurrencyState>()(
           highest: sorted[0],
           lowest: sorted[sorted.length - 1]
         };
-      },
-      getSortedRates: () => {
-        const { rates } = get();
-        return [...rates].sort((a, b) => b.rate - a.rate);
       }
     }),
     {
       name: 'currency-store',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: {
+        getItem: async (name) => {
+          const value = await AsyncStorage.getItem(name);
+          return value ? JSON.parse(value) : null;
+        },
+        setItem: async (name, value) => {
+          await AsyncStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: async (name) => {
+          await AsyncStorage.removeItem(name);
+        }
+      }
     }
   )
 );

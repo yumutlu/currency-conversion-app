@@ -1,9 +1,9 @@
 import CurrencyList from '@/src/components/CurrencyList';
 import { Colors } from '@/src/styles/colors';
-import React from 'react';
+import * as React from 'react';
 import { SafeAreaView, StyleSheet, StatusBar } from 'react-native';
 
-const App: React.FC = () => {
+export default function HomeScreen() {
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
@@ -12,7 +12,7 @@ const App: React.FC = () => {
       </SafeAreaView>
     </>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -20,5 +20,3 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
 });
-
-export default App;

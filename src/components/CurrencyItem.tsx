@@ -12,7 +12,7 @@ interface CurrencyItemProps {
   isHighlight?: boolean;
 }
 
-const CurrencyItem: React.FC<CurrencyItemProps> = ({ item, isHighlight }) => {
+const CurrencyItem: React.FC<CurrencyItemProps> = ({ item, isHighlight = false }) => {
   return (
     <View
       style={[styles.container, isHighlight && styles.highlightContainer]}
@@ -28,7 +28,7 @@ const CurrencyItem: React.FC<CurrencyItemProps> = ({ item, isHighlight }) => {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   highlightContainer: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.highlightItem,
   },
   codeContainer: {
     width: 60,
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
   rate: {
     fontSize: 14,
-    color: Colors.lightText,
+    color: Colors.secondary,
     marginBottom: 2,
   },
   date: {

@@ -1,44 +1,45 @@
-import React, { useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, FlatList, StyleSheet, TextInput, RefreshControl } from 'react-native';
 import useCurrencyStore from '../store/currencyStore';
-import CurrencyItem from './CurrencyItem';
 import { Colors } from '../styles/colors';
+import CurrencyItem from './CurrencyItem';
+import { CurrencyInfo } from '../api/currencyApi';
 
 const CurrencyList: React.FC = () => {
-  const { rates, fetchRates, isLoading, error, getHighestAndLowestRates, getSortedRates } = useCurrencyStore();
-
-  const onRefresh = useCallback(() => {
-    fetchRates();
-  }, [fetchRates]);
+  const { rates, fetchRates, isLoading, error, getHighestAndLowestRates, lastUpdated } = useCurrencyStore();
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchRates();
-    const interval = setInterval(fetchRates, 10000);
+    const interval = setInterval(fetchRates, 10000); // Fetch every 10 seconds
     return () => clearInterval(interval);
   }, [fetchRates]);
 
   const { highest, lowest } = getHighestAndLowestRates();
-  const sortedRates = getSortedRates();
 
-  if (isLoading && rates.length === 0) {
-    return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
+  const filteredRates = rates.filter((item: CurrencyInfo) =>
+    item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const renderItem = useCallback(({ item }: { item: CurrencyInfo }) => <CurrencyItem item={item} />, []);
 
   if (error) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorMessage}>Error: {error}</Text>
-      </View>
-    );
+    return <Text style={styles.errorMessage}>Error: {error}</Text>;
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Currency Conversion Rates</Text>
+      {lastUpdated && (
+        <Text style={styles.lastUpdated}>Last updated: {new Date(lastUpdated).toLocaleString()}</Text>
+      )}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search currency..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
       {highest && lowest && (
         <View style={styles.highlightContainer}>
           <Text style={styles.highlightTitle}>Highest and Lowest Rates:</Text>
@@ -47,12 +48,11 @@ const CurrencyList: React.FC = () => {
         </View>
       )}
       <FlatList
-        data={sortedRates}
-        renderItem={({ item }) => <CurrencyItem item={item} />}
+        data={filteredRates}
+        renderItem={renderItem}
         keyExtractor={(item) => item.code}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={onRefresh} colors={[Colors.primary]} />
+          <RefreshControl refreshing={isLoading} onRefresh={fetchRates} colors={[Colors.primary]} />
         }
       />
     </View>
@@ -63,36 +63,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
+    padding: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.text,
+    color: Colors.primary,
     textAlign: 'center',
-    marginVertical: 16,
+    marginBottom: 8,
   },
-  errorMessage: {
-    fontSize: 18,
-    color: Colors.error,
+  lastUpdated: {
+    fontSize: 12,
+    color: Colors.lightText,
     textAlign: 'center',
+    marginBottom: 16,
+  },
+  searchInput: {
+    height: 40,
+    borderColor: Colors.border,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 16,
   },
   highlightContainer: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.highlight,
     padding: 16,
-    marginBottom: 16,
     borderRadius: 8,
-    marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: 16,
   },
   highlightTitle: {
     fontSize: 18,
@@ -100,9 +98,11 @@ const styles = StyleSheet.create({
     color: Colors.text,
     marginBottom: 8,
   },
-  separator: {
-    height: 1,
-    backgroundColor: Colors.border,
+  errorMessage: {
+    fontSize: 18,
+    color: Colors.error,
+    textAlign: 'center',
+    margin: 20,
   },
 });
 

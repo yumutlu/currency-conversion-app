@@ -7,4 +7,6 @@ export const Colors = {
     border: '#dddddd',
     white: '#ffffff',
     error: '#e74c3c',
+    highlight: '#e8f4fd',
+    highlightItem: '#f9f9f9',
 };
