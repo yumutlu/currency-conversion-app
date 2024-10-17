@@ -1,16 +1,13 @@
-import CurrencyList from '@/src/components/CurrencyList';
-import { Colors } from '@/src/styles/colors';
-import * as React from 'react';
-import { SafeAreaView, StyleSheet, StatusBar } from 'react-native';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import CurrencyList from '../../src/components/CurrencyList';
+import { Colors } from '../../src/styles/colors';
 
-export default function HomeScreen() {
+export default function MainScreen() {
   return (
-    <>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
-      <SafeAreaView style={styles.container}>
-        <CurrencyList />
-      </SafeAreaView>
-    </>
+    <View style={styles.container}>
+      <CurrencyList />
+    </View>
   );
 }
 
@@ -18,5 +15,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+    marginTop: 30,
   },
 });
